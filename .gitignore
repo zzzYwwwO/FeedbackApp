@@ -1,0 +1,76 @@
+# ===================== 核心依赖与包管理（必加） =====================
+# npm/yarn/pnpm 依赖目录（无需提交，npm install 自动生成）
+node_modules/
+# 包锁文件（可选忽略，团队统一可保留，避免版本不一致）
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-shrinkwrap.json
+# yarn 缓存
+.yarn/
+.pnp.*
+
+# ===================== 构建/编译产物 =====================
+# Express 项目常见构建目录（如用tsc编译、babel转译）
+dist/
+build/
+out/
+lib/
+# TypeScript 编译缓存
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# ===================== 日志与临时文件 =====================
+# 日志文件（Express 项目常用的日志输出）
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# ===================== 敏感配置与环境文件（重点） =====================
+# 环境变量文件（存放数据库密码、密钥、端口等敏感信息）
+.env
+.env.*
+!.env.example  # 保留示例文件，方便团队配置
+# 自定义配置文件（Express 项目常见的配置目录/文件）
+config/local.js
+config/private.js
+config/db.config.local.js
+*.secret.js
+
+# ===================== 操作系统与编辑器缓存 =====================
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+# Mac/Linux
+.DS_Store
+.Trashes
+# VS Code（编辑器缓存）
+.vscode/
+!.vscode/launch.json  # 保留调试配置（可选）
+!.vscode/settings.json
+# IntelliJ/WebStorm
+.idea/
+*.iml
+
+# ===================== Express 项目特殊忽略项 =====================
+# PM2 进程管理配置（如用PM2部署，本地配置无需提交）
+ecosystem.config.js
+.pm2/
+# 覆盖率报告（单元测试生成）
+coverage/
+# 上传文件目录（用户上传的静态文件，无需提交）
+uploads/
+# 静态资源缓存（如图片、视频等）
+public/uploads/
+public/cache/

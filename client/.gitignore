@@ -1,0 +1,44 @@
+# 包依赖（npm/yarn/pnpm）
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+yarn-error.log
+.npmrc
+.yarnrc
+
+# 构建产物
+dist/
+build/
+out/
+public/build/
+*.min.js
+*.min.css
+
+# 前端缓存/临时文件
+.cache/
+.eslintcache
+.parcel-cache/
+.vite/
+coverage/
+*.tsbuildinfo
+*.js.map
+*.css.map
+
+# 小程序/移动端
+unpackage/
+dist/build/
+app-plus/
+uni_modules/
+
+
+# ===================== 敏感配置与环境文件（重点） =====================
+# 环境变量文件（存放数据库密码、密钥、端口等敏感信息）
+.env
+.env.*
+!.env.example  # 保留示例文件，方便团队配置
+# 自定义配置文件（Express 项目常见的配置目录/文件）
+config/local.js
+config/private.js
+config/db.config.local.js
+*.secret.js
