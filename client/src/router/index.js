@@ -1,85 +1,74 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: () => import('../views/HomeView.vue'),
+    path: "/",
+    name: "Home",
+    component: () => import("../views/HomeView.vue"),
     meta: {
-      title: 'SimpleFeedbackApp - דף הבית',
+      title: "SimpleFeedbackApp - דף הבית",
     },
   },
   {
-    path: '/admin',
-    name: 'Admin',
-    component: () => import('../views/admin/AdminView.vue'),
+    path: "/admin",
+    name: "Admin",
+    component: () => import("../views/admin/AdminView.vue"),
     meta: {
-      title: 'פאנל ניהול משובים',
+      title: "פאנל ניהול משובים",
       requiresAdmin: true,
     },
   },
   {
-    path: '/feedback/:id',
-    name: 'FeedbackDetail',
-    component: () => import('../views/FeedbackDetailView.vue'),
+    path: "/feedback/:id",
+    name: "FeedbackDetail",
+    component: () => import("../views/FeedbackDetailView.vue"),
     props: true,
     meta: {
-      title: 'פרטי משוב',
+      title: "פרטי משוב",
       requiresAdmin: true,
     },
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/LoginView.vue'),
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("../views/NotFoundView.vue"),
     meta: {
-      title: 'SimpleFeedbackApp - דף כניסה',
+      title: "דף לא נמצא",
     },
   },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('../views/NotFoundView.vue'),
-    meta: {
-      title: 'דף לא נמצא',
-    },
-  },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition
+      return savedPosition;
     } else {
-      return { top: 0 }
+      return { top: 0 };
     }
-  }
-})
+  },
+});
 
 // Navigation guards
-router.beforeEach((to, from, next) => {
-  // Update page title
-  document.title = to.meta.title || 'SimpleFeedbackApp'
+// router.beforeEach((to, from, next) => {
+//   // Update page title
+//   document.title = to.meta.title || 'SimpleFeedbackApp'
 
-  const authStore = useAuthStore();
-  const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
-  const isAuthenticated = authStore.isAuthenticated;
+//   const authStore = useAuthStore();
+//   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
+//   const isAuthenticated = authStore.isAuthenticated;
 
-  // Redirect authenticated users away from /login
-  if (to.path === '/login' && isAuthenticated) {
-    return next('/admin');
-  }
-  else if (requiresAdmin && !isAuthenticated) {
-    return next('/login');
-  } else {
-    return next();
-  }
-})
-
-
-
+//   // Redirect authenticated users away from /login
+//   if (to.path === '/login' && isAuthenticated) {
+//     return next('/admin');
+//   }
+//   else if (requiresAdmin && !isAuthenticated) {
+//     return next('/login');
+//   } else {
+//     return next();
+//   }
+// })
 
 export default router;
