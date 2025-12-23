@@ -11,6 +11,7 @@ import Feedback from "./config/models/feedback.js";
 dotenv.config();
 
 const uri = process.env.MONGODB_URI;
+const isProduction = process.env.NODE_ENV === "production";
 
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
@@ -27,7 +28,20 @@ export default function server() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
-  app.use(express.static(path.join(__dirname, "dist")));
+  // 根据环境变量配置静态文件服务
+  if (isProduction) {
+    // 生产环境：使用打包好的dist文件
+    console.log("🚀 Production mode: Serving static files from dist/");
+    app.use(express.static(path.join(__dirname, "dist")));
+  } else {
+    // 开发环境：使用前端开发服务器（需要npm run dev）
+    console.log(
+      "🔧 Development mode: Frontend should be running on npm run dev"
+    );
+    console.log(
+      `Frontend dev server: http://localhost:${process.env.PORT_FRONTEND}`
+    );
+  }
 
   mongoose
     .connect(uri, {})
@@ -93,9 +107,20 @@ export default function server() {
   app.use("/api/auth", auth);
   app.use("/api/feedback", feedback);
 
-  app.use("/*", (req, res) => {
-    res.sendFile(path.join(__dirname, "dist", "index.html"));
-  });
+  // 根据环境变量配置路由处理
+  if (isProduction) {
+    // 生产环境：所有非API路由都返回index.html（SPA路由）
+    app.use("/*", (req, res) => {
+      res.sendFile(path.join(__dirname, "dist", "index.html"));
+    });
+  } else {
+    // 开发环境：API路由正常处理，其他路由由前端开发服务器处理
+    app.use("/*", (req, res) => {
+      res.redirect(
+        `http://localhost:${process.env.PORT_FRONTEND}${req.originalUrl}`
+      );
+    });
+  }
 
   // Custom error-handling middleware
   app.use((err, req, res, next) => {
