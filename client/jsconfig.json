@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./", // 基础路径
+    "paths": {
+      // 告诉编辑器 @ 对应 src 目录
+      "@/*": ["src/*"]
+    },
+    "target": "ES6",
+    "module": "ESNext",
+    "moduleResolution": "Node"
+  },
+  // 指定需要识别的目录（排除node_modules等）
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

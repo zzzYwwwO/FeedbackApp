@@ -4,7 +4,7 @@
       <v-col cols="12" md="8" lg="6">
         <div class="d-flex align-center mb-6">
           <v-btn icon variant="text" @click="$router.go(-1)" class="me-2">
-            <v-icon>mdi-arrow-right</v-icon>
+            <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
           <h1 class="text-h4 font-weight-bold">反馈详情</h1>
         </div>
@@ -50,23 +50,38 @@
                   </div>
                 </div>
               </div>
-
-              <v-chip
-                :color="getRatingColor(feedback.rating)"
-                variant="flat"
-                size="large"
-                class="text-white"
-              >
-                <v-icon start>mdi-star</v-icon>
-                {{ feedback.rating }} - {{ getRatingText(feedback.rating) }}
-              </v-chip>
+              <div>
+                <v-chip v-if="feedback.isReply" color="green" variant="flat">
+                  已回复
+                </v-chip>
+                <v-chip v-if="!feedback.isReply" color="red" variant="flat">
+                  未回复
+                </v-chip>
+                <v-chip
+                  :color="getRatingColor(feedback.rating)"
+                  variant="flat"
+                  size="large"
+                  class="text-white"
+                  style="margin-left: 1vw"
+                >
+                  <v-icon start>mdi-star</v-icon>
+                  {{ feedback.rating }} - {{ getRatingText(feedback.rating) }}
+                </v-chip>
+              </div>
             </div>
           </v-card-title>
 
           <!-- Content -->
           <v-card-text class="pa-6">
             <div class="mb-6">
-              <h3 class="text-h6 mb-3">反馈内容：</h3>
+              <div class="d-flex justify-space-between">
+                <h3 class="text-h6 mb-3">反馈内容：</h3>
+                <v-btn color="error" variant="outlined" @click="deleteFeedback">
+                  <v-icon start>mdi-delete</v-icon>
+                  删除反馈
+                </v-btn>
+              </div>
+
               <div class="text-body-1 pa-4 bg-grey-lighten-4 rounded">
                 {{ feedback.message }}
               </div>
@@ -95,39 +110,26 @@
 
             <!-- Rating -->
             <v-card variant="outlined" class="mt-4 pa-4">
-              <h4 class="text-h6 mb-3">评分分析</h4>
-              <div class="d-flex align-center mb-2">
-                <span class="me-2">评分：</span>
-                <v-rating
-                  :model-value="feedback.rating"
-                  readonly
-                  color="amber"
-                  size="small"
-                ></v-rating>
-                <span class="ms-2 text-grey-darken-1"
-                  >({{ feedback.rating }}/5)</span
-                >
+              <div style="display: flex; justify-content: space-between">
+                <h4 class="text-h6 mb-3">回复</h4>
+                <v-btn @click="replyToUser(feedback._id)">
+                  {{ feedback.isReply ? "更新" : "提交" }}
+                  <template #append>
+                    <img src="/send.svg" alt="" />
+                  </template>
+                </v-btn>
               </div>
-              <div class="text-body-2 text-grey-darken-1">
-                {{ getRatingDescription(feedback.rating) }}
+
+              <div class="d-flex align-center mb-2">
+                <v-textarea
+                  v-model="reply"
+                  :rules="messageRules"
+                  row-height="15"
+                  rows="3"
+                ></v-textarea>
               </div>
             </v-card>
           </v-card-text>
-
-          <!-- Actions -->
-          <v-card-actions class="pa-6">
-            <v-btn variant="outlined" @click="$router.push({ name: 'Admin' })">
-              <v-icon start>mdi-arrow-right</v-icon>
-              返回列表
-            </v-btn>
-
-            <v-spacer></v-spacer>
-
-            <v-btn color="error" variant="outlined" @click="deleteFeedback">
-              <v-icon start>mdi-delete</v-icon>
-              删除反馈
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -146,25 +148,59 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <SnackBar
+      v-model="snackbar.show"
+      :snacbarText="snackbar.text"
+      :snackbarColorBt="snackbar.color"
+    ></SnackBar>
   </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { feedbacksService } from "@/services/feedbacks.service";
+import SnackBar from "@/components/widgets/snackBar.vue";
 
 const props = defineProps({
   id: String,
 });
 
+const snackbar = reactive({
+  show: false,
+  text: "",
+  color: "green",
+});
+
+const showSnackbar = (text, color) => {
+  snackbar.text = text;
+  snackbar.color = color;
+  snackbar.show = true;
+};
+
 const feedback = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const deleteDialog = ref(false);
+const reply = ref("");
 
 const route = useRoute();
 const router = useRouter();
+
+const replyToUser = async (id) => {
+  try {
+    console.log("回复", reply);
+    const response = await feedbacksService.replyFeedback(id, reply.value);
+    console.log("reply-response", response);
+    showSnackbar("回复成功！", "green");
+    fetchFeedback();
+  } catch (err) {
+    error.value = "回复反馈时出错";
+    showSnackbar("回复失败！", "red");
+    console.error("Error reply feedback:", err);
+  }
+};
 
 const fetchFeedback = async () => {
   try {
@@ -172,6 +208,11 @@ const fetchFeedback = async () => {
     const response = await feedbacksService.fetchFeedback(feedbackId);
     if (response) {
       feedback.value = response;
+      console.log("回显", feedback.value);
+      // 如果有反馈，尝试查找是否有回复，如果有就回显
+      if (feedback.value.isReply) {
+        reply.value = feedback.value.reply;
+      }
     } else {
       error.value = "反馈未找到";
     }
@@ -188,6 +229,13 @@ const getRatingColor = (rating) => {
   if (rating >= 3) return "amber";
   return "red";
 };
+
+const messageRules = [
+  (v) => !!v || "Message is required",
+  (v) => (v && v.length >= 5) || "Message must contain at least 5 characters",
+  (v) =>
+    (v && v.length <= 500) || "Message must contain less than 500 characters",
+];
 
 const getRatingText = (rating) => {
   const texts = {

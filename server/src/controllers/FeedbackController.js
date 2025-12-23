@@ -17,6 +17,7 @@ class FeedbackController {
       const rating = req.query.rating ? parseInt(req.query.rating) : null;
       const filter = req.query.filter || "all";
       const sortBy = req.query.sortBy || "date";
+      const isReply = req.query.isReply || null;
 
       const result = await FeedbackModel.getFeedbacks({
         page,
@@ -25,6 +26,7 @@ class FeedbackController {
         rating,
         filter,
         sortBy,
+        isReply,
       });
 
       return res.status(200).json(result);
@@ -56,9 +58,35 @@ class FeedbackController {
     }
   }
 
+  static async getFeedbackByName(req, res) {
+    try {
+      const { name } = req.query;
+      console.log("name", name);
+      const result = await FeedbackModel.getFeedbackByName(name);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      return res.status(500).json({ message: "internal error" });
+    }
+  }
+
+  static async replyFeedback(req, res) {
+    try {
+      const { id } = req.params;
+      const { reply } = req.body;
+
+      console.log("reply-id", reply, id);
+      const result = await FeedbackModel.replyFeedback(id, reply);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      return res.status(500).json({ message: "reply Feedback error!" });
+    }
+  }
+
   static async createFeedback(req, res) {
     try {
-      const { name, rating, message } = req.body;
+      const { name, rating, message, isReply } = req.body;
 
       // Validation
       if (!name || !rating || !message) {

@@ -1,30 +1,40 @@
 <template>
   <v-container fluid class="pa-0">
-    <div class="gradient-bg min-h-screen">
-      <v-container class="py-8">
+    <div class="gradient-bg min-h-screen d-flex align-center justify-center">
+      <v-container class="py-4 py-sm-8">
         <v-row justify="center">
-          <v-col cols="12" md="8" lg="6">
+          <v-col cols="12" sm="10" md="8" lg="6">
             <!-- Header -->
-            <div class="text-center mb-8">
-              <h1 class="text-h3 font-weight-bold text-white mb-2">
-                SimpleFeedbackApp
+            <div class="text-center mb-4 mb-sm-8">
+              <h1 class="text-h4 text-sm-h3 font-weight-bold text-white mb-2">
+                Feedback
               </h1>
-              <p class="text-h6 text-blue-lighten-1">
+              <p class="text-body-1 text-sm-h6 text-blue-lighten-1">
                 We're happy to hear your feedback
               </p>
             </div>
 
             <!-- Feedback Card -->
             <v-card class="elevation-8 rounded-lg">
-              <v-card-title class="text-center pa-6">
+              <div
+                class="d-flex justify-end pa-2 pa-sm-4"
+                @click="isOpenFeedback = true"
+              >
+                <v-icon size="large" class="d-none d-sm-flex" end
+                  >mdi-menu</v-icon
+                >
+                <v-icon size="medium" class="d-sm-none" end>mdi-menu</v-icon>
+              </div>
+
+              <v-card-title class="text-center pa-4 pa-sm-6">
                 <v-icon class="me-2" color="primary">mdi-message-text</v-icon>
-                Feedback Form
+                <span class="text-h6 text-sm-h5">Feedback Form</span>
               </v-card-title>
-              <v-card-subtitle class="text-center pb-4">
-                Please share your experience and help us improve
+              <v-card-subtitle class="text-center pb-2 pb-sm-4">
+                Click the top right corner to view replies
               </v-card-subtitle>
 
-              <v-card-text class="pa-6">
+              <v-card-text class="pa-4 pa-sm-6">
                 <v-form
                   ref="form"
                   v-model="valid"
@@ -32,15 +42,14 @@
                   class="text-start"
                 >
                   <v-text-field
-                    v-model="feedback.name"
-                    label="Full Name"
+                    v-model="userId"
+                    readonly=""
                     prepend-inner-icon="mdi-account"
                     variant="outlined"
                     :rules="nameRules"
                     required
-                    class="mb-4 text-start"
+                    class="mb-3 mb-sm-4 text-start"
                   ></v-text-field>
-
                   <v-select
                     v-model="feedback.rating"
                     label="Rating (1-5)"
@@ -49,18 +58,17 @@
                     :items="ratingItems"
                     :rules="ratingRules"
                     required
-                    class="mb-4 text-start"
+                    class="mb-3 mb-sm-4 text-start"
                   ></v-select>
-
                   <v-textarea
                     v-model="feedback.message"
                     label="Message"
                     prepend-inner-icon="mdi-message"
                     variant="outlined"
                     :rules="messageRules"
-                    rows="4"
+                    rows="3"
                     required
-                    class="mb-4 text-start"
+                    class="mb-3 mb-sm-4 text-start"
                   ></v-textarea>
 
                   <v-btn
@@ -70,7 +78,7 @@
                     block
                     :loading="loading"
                     :disabled="!valid"
-                    class="mb-4"
+                    class="mb-3 mb-sm-4"
                   >
                     <v-icon start>mdi-send</v-icon>
                     Submit Feedback
@@ -80,12 +88,16 @@
             </v-card>
 
             <!-- Actions -->
-            <div class="text-center mt-6" v-if="authStore.isAuthenticated">
+            <div
+              class="text-center mt-4 mt-sm-6"
+              v-if="authStore.isAuthenticated"
+            >
               <v-btn
                 variant="outlined"
                 color="white"
                 :to="{ name: 'Admin' }"
-                class="me-4"
+                class="me-3 me-sm-4"
+                size="large"
               >
                 <v-icon start>mdi-shield-account</v-icon>
                 Admin Panel
@@ -95,17 +107,91 @@
         </v-row>
       </v-container>
     </div>
-
-    <SnackBar
-      v-model="snackbar.show"
-      :snacbarText="snackbar.text"
-      :snackbarColorBt="snackbar.color"
-    ></SnackBar>
+    <!-- 历史对话弹窗 -->
+    <v-dialog v-model="isOpenFeedback" max-width="600" scrollable>
+      <v-card>
+        <v-card-title class="d-flex justify-space-between align-center pa-4">
+          <span class="text-h6">Reply History</span>
+          <v-btn icon @click="isOpenFeedback = false" variant="text">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text class="pa-4">
+          <template v-if="feedbackHistory.length">
+            <div v-for="item in feedbackHistory" :key="item._id" class="mb-4">
+              <v-card class="elevation-2 pa-3">
+                <div
+                  class="d-flex justify-space-between align-start flex-column flex-sm-row"
+                >
+                  <div class="d-flex align-center mb-2 mb-sm-0">
+                    <v-avatar color="blue-lighten-1" size="40" class="me-3">
+                      <v-icon color="white" size="small">mdi-account</v-icon>
+                    </v-avatar>
+                    <div>
+                      <div class="text-subtitle-1 font-weight-medium">
+                        {{ userId }}
+                      </div>
+                      <div class="text-caption text-grey-darken-1">
+                        {{ formatDate(item.createdAt) }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-column align-start align-sm-end">
+                    <v-btn
+                      color="red"
+                      size="x-small"
+                      variant="outlined"
+                      @click="deleteFeedback(item._id)"
+                      class="mb-1"
+                    >
+                      Withdraw
+                    </v-btn>
+                    <v-chip size="small" v-if="!item.isReply" color="orange"
+                      >Processing</v-chip
+                    >
+                    <v-chip size="small" v-if="item.isReply" color="green"
+                      >Successful</v-chip
+                    >
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <v-expansion-panels>
+                    <v-expansion-panel
+                      title="FeedBack Info"
+                      :text="item.message"
+                    ></v-expansion-panel>
+                    <v-expansion-panel
+                      v-if="item.isReply"
+                      title="Reply Info"
+                      :text="item.reply"
+                    ></v-expansion-panel>
+                  </v-expansion-panels>
+                </div>
+              </v-card>
+            </div>
+          </template>
+          <template v-else>
+            <div class="text-center py-8">
+              <v-icon size="64" color="grey-lighten-1" class="mb-2"
+                >mdi-inbox</v-icon
+              >
+              <div class="text-h6 text-grey-darken-1">No feedback</div>
+            </div>
+          </template>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
+
+  <SnackBar
+    v-model="snackbar.show"
+    :snacbarText="snackbar.text"
+    :snackbarColorBt="snackbar.color"
+  ></SnackBar>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, inject } from "vue";
+import { ref, reactive, onMounted, inject, openBlock } from "vue";
 import { useRouter } from "vue-router";
 import { feedbacksService } from "@/services/feedbacks.service";
 import { useAuthStore } from "@/stores/auth";
@@ -119,6 +205,37 @@ const valid = ref(false);
 const loading = ref(false);
 const form = ref(null);
 const statsSection = ref(null);
+// 是否打开回复的历史
+const isOpenFeedback = ref(false);
+// 定义响应式变量存储userId
+const userId = ref("No UserId");
+
+onMounted(async () => {
+  await initUserId();
+  getFeedbackByName(userId.value);
+  fetchStats();
+});
+
+// 复用你的原生getQueryParams方法（完全不变，直接用）
+const getQueryParams = () => {
+  var url = window.location.href;
+  var urlObj = new URL(url);
+  var searchParams = urlObj.searchParams;
+  var queryParams = {};
+  searchParams.forEach(function (value, key) {
+    queryParams[key] = value;
+  });
+  return queryParams;
+};
+
+const initUserId = async () => {
+  // 获取所有URL参数
+  const params = getQueryParams();
+  // 赋值给userId（模拟你示例中的document.querySelector赋值逻辑）
+  if (params.userId) {
+    userId.value = params.userId;
+  }
+};
 
 const feedback = reactive({
   name: "",
@@ -138,6 +255,39 @@ const stats = reactive({
   positive: 0,
   weekly: 0,
 });
+
+const feedbackHistory = ref([]);
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const deleteFeedback = async (id) => {
+  // 添加浏览器原生确认弹窗
+  const isConfirmed = window.confirm(
+    "Are you sure you want to withdraw this feedback? This action cannot be undone."
+  );
+
+  // 如果用户取消，则不执行删除操作
+  if (!isConfirmed) {
+    return;
+  }
+
+  try {
+    const response = await feedbacksService.deleteFeedback(id);
+    console.log("response-delete", response);
+    showSnackbar("Your feedback has been withdrawed successfully!", "green");
+    await getFeedbackByName(userId.value);
+  } catch (error) {
+    showSnackbar("Error withdraw feedback", "red");
+    console.error("Error withdraw feedback:", error);
+  }
+};
 
 // Form validation rules
 const nameRules = [
@@ -171,13 +321,15 @@ const handleSubmitFeedback = async () => {
 
   try {
     const response = await feedbacksService.submitFeedback({
-      name: feedback.name,
+      name: userId.value,
       rating: feedback.rating,
       message: feedback.message,
+      isReply: false,
     });
     showSnackbar("Your feedback has been submitted successfully!", "green");
     resetForm();
     await fetchStats();
+    await getFeedbackByName(userId.value);
   } catch (error) {
     showSnackbar("Error submitting feedback", "red");
     console.error("Error submitting feedback:", error);
@@ -211,9 +363,16 @@ const fetchStats = async () => {
   }
 };
 
-onMounted(() => {
-  fetchStats();
-});
+// name即userId.value
+const getFeedbackByName = async (name) => {
+  try {
+    const response = await feedbacksService.fetchFeedbackByName(name);
+    feedbackHistory.value = response;
+    console.log("feedback-name", response);
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+  }
+};
 </script>
 
 <style scoped>
@@ -224,5 +383,30 @@ onMounted(() => {
 
 .v-card {
   backdrop-filter: blur(10px);
+}
+
+/* 响应式字体大小 */
+@media (max-width: 600px) {
+  .text-responsive {
+    font-size: 0.875rem;
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 960px) {
+  .gradient-bg {
+    padding: 16px 0;
+  }
+
+  .v-card {
+    margin: 0 8px;
+  }
+}
+
+/* 平板优化 */
+@media (min-width: 960px) and (max-width: 1264px) {
+  .v-container {
+    max-width: 900px;
+  }
 }
 </style>

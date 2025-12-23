@@ -78,7 +78,7 @@
               <v-col cols="12" md="4">
                 <v-text-field
                   v-model="searchQuery"
-                  label="搜索反馈"
+                  label="搜索userId"
                   prepend-inner-icon="mdi-magnify"
                   variant="outlined"
                   density="compact"
@@ -101,6 +101,17 @@
                   v-model="filterRating"
                   label="按评分筛选"
                   :items="ratingFilterOptions"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  clearable
+                ></v-select>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-select
+                  v-model="isReply"
+                  label="按是否回复筛选"
+                  :items="isReplyOpt"
                   variant="outlined"
                   density="compact"
                   hide-details
@@ -201,6 +212,23 @@
 
                     <div class="d-flex align-center">
                       <v-chip
+                        v-if="feedback.isReply"
+                        color="green"
+                        size="small"
+                        variant="flat"
+                      >
+                        已回复
+                      </v-chip>
+                      <v-chip
+                        v-if="!feedback.isReply"
+                        color="red"
+                        size="small"
+                        variant="flat"
+                      >
+                        未回复
+                      </v-chip>
+                      <div style="width: 1vw"></div>
+                      <v-chip
                         :color="getRatingColor(feedback.rating)"
                         variant="flat"
                         class="text-white me-2"
@@ -286,6 +314,7 @@ const filterRating = ref(null);
 const activeFilter = ref("all");
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const isReply = ref(null);
 
 const totalCount = ref(0);
 const totalPages = ref(0);
@@ -315,7 +344,16 @@ const ratingFilterOptions = [
   { title: "1星", value: 1 },
 ];
 
+const isReplyOpt = [
+  { title: "已回复", value: true },
+  { title: "未回复", value: false },
+];
+
 const itemsPerPageOptions = [10, 20, 50, 100];
+
+onMounted(() => {
+  fetchFeedbacks();
+});
 
 const displayInfo = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value + 1;
@@ -348,7 +386,7 @@ const weeklyFeedbacks = computed(() => {
 });
 
 // Watch for filter changes to reset pagination
-watch([searchQuery, filterRating, activeFilter, sortBy], () => {
+watch([searchQuery, filterRating, activeFilter, sortBy, isReply], () => {
   currentPage.value = 1;
   fetchFeedbacks();
 });
@@ -378,6 +416,7 @@ const fetchFeedbacks = async () => {
       rating: filterRating.value,
       filter: activeFilter.value,
       sortBy: sortBy.value,
+      isReply: isReply.value,
     };
 
     const response = await feedbacksService.fetchFeedbacks(options);
@@ -411,6 +450,7 @@ const clearFilters = () => {
   filterRating.value = null;
   activeFilter.value = "all";
   currentPage.value = 1;
+  isReply.value = null;
 };
 
 const getFilterLabel = (filter) => {
@@ -469,10 +509,6 @@ const deleteFeedback = async (id) => {
     }
   }
 };
-
-onMounted(() => {
-  fetchFeedbacks();
-});
 </script>
 
 <style scoped>
