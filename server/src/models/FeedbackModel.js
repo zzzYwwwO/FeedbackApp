@@ -105,7 +105,17 @@ class FeedbackModel {
   }
 
   static async createFeedback(newFeedback) {
-    return await Feedback.create(newFeedback);
+    const { name, message } = newFeedback;
+    return await Feedback.findOneAndUpdate(
+      { name: name },
+      { $push: { message: message } }, // 像message字段追加数据message
+      {
+        upsert: true, // 无匹配文档则创建,有就更新！
+        new: true, // 返回更新后的文档（而非更新前）
+        runValidators: true, // 执行 Schema 校验（确保 newMessage 符合规则）
+        setDefaultsOnInsert: true, // 插入新文档时应用默认值（如 timestamps）
+      }
+    );
   }
 
   static async getFeedbacksStat() {
@@ -147,14 +157,6 @@ class FeedbackModel {
     }
     return true;
   }
-
-  // static async findById(_id) {
-
-  //   const user = await Users.findById(_id);
-
-  //   return user;
-
-  // }
 }
 
 export default FeedbackModel;

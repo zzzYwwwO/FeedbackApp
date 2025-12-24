@@ -5,11 +5,6 @@ class FeedbackController {
 
   static async getFeedbacks(req, res) {
     try {
-      // const { role } = req;
-      // if (role !== 'admin') {
-      //   return res.status(401).json({ message: "You don't have permission to perform this action." });
-      // }
-
       // Get pagination parameters from query
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
@@ -38,14 +33,6 @@ class FeedbackController {
 
   static async getFeedback(req, res) {
     try {
-      // const { role } = req;
-      // if (role !== "admin") {
-      //   return res
-      //     .status(401)
-      //     .json({
-      //       message: "You don't have permission to perform this action.",
-      //     });
-      // }
       const { id } = req.query;
       console.log(id);
 
@@ -86,17 +73,11 @@ class FeedbackController {
 
   static async createFeedback(req, res) {
     try {
-      const { name, rating, message, isReply } = req.body;
+      const { name, message } = req.body;
 
       // Validation
-      if (!name || !rating || !message) {
+      if (!name || !message) {
         return res.status(400).json({ error: "All fields are required" });
-      }
-
-      if (rating < 1 || rating > 5) {
-        return res
-          .status(400)
-          .json({ error: "Rating must be between 1 and 5" });
       }
 
       if (name.length < 2) {

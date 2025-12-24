@@ -1,11 +1,28 @@
 import mongoose from "mongoose";
 
+const messageItemSchema = new mongoose.Schema({
+  role: {
+    type: String,
+    required: true,
+    enum: ["user", "admin"],
+    trim: true,
+  },
+  msg: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 10,
+    maxlength: 500,
+  },
+});
+
 // Feedback Schema
 const feedbackSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
+      unique: true,
       trim: true,
       minlength: 2,
     },
@@ -16,20 +33,9 @@ const feedbackSchema = new mongoose.Schema(
       max: 5,
     },
     message: {
-      type: String,
+      type: [messageItemSchema],
       required: true,
-      trim: true,
-      minlength: 10,
-    },
-    isReply: {
-      type: Boolean,
-      required: false,
-      trim: true,
-    },
-    reply: {
-      type: String,
-      required: false,
-      trim: true,
+      default: [],
     },
   },
   {

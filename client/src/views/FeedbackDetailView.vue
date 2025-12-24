@@ -50,24 +50,7 @@
                   </div>
                 </div>
               </div>
-              <div>
-                <v-chip v-if="feedback.isReply" color="green" variant="flat">
-                  已回复
-                </v-chip>
-                <v-chip v-if="!feedback.isReply" color="red" variant="flat">
-                  未回复
-                </v-chip>
-                <v-chip
-                  :color="getRatingColor(feedback.rating)"
-                  variant="flat"
-                  size="large"
-                  class="text-white"
-                  style="margin-left: 1vw"
-                >
-                  <v-icon start>mdi-star</v-icon>
-                  {{ feedback.rating }} - {{ getRatingText(feedback.rating) }}
-                </v-chip>
-              </div>
+              <div></div>
             </div>
           </v-card-title>
 
@@ -82,8 +65,16 @@
                 </v-btn>
               </div>
 
-              <div class="text-body-1 pa-4 bg-grey-lighten-4 rounded">
-                {{ feedback.message }}
+              <div
+                style="max-height: 28vh; overflow-y: auto"
+                ref="feedbackContainer"
+              >
+                <div
+                  v-for="item in feedback.message"
+                  class="text-body-1 pa-1 bg-grey-lighten-4"
+                >
+                  {{ item.role + ":  " + item.msg }}
+                </div>
               </div>
             </div>
 
@@ -112,8 +103,8 @@
             <v-card variant="outlined" class="mt-4 pa-4">
               <div style="display: flex; justify-content: space-between">
                 <h4 class="text-h6 mb-3">回复</h4>
-                <v-btn @click="replyToUser(feedback._id)">
-                  {{ feedback.isReply ? "更新" : "提交" }}
+                <v-btn @click="replyToUser(feedback.name)">
+                  提交
                   <template #append>
                     <img src="/send.svg" alt="" />
                   </template>
@@ -184,15 +175,34 @@ const loading = ref(true);
 const error = ref(null);
 const deleteDialog = ref(false);
 const reply = ref("");
+const feedbackContainer = ref(null); // 获取dom
 
 const route = useRoute();
 const router = useRouter();
 
-const replyToUser = async (id) => {
+onMounted(async () => {
+  await fetchFeedback();
+  smoothScrollToBottom();
+});
+
+function smoothScrollToBottom() {
+  if (!feedbackContainer.value) return;
+
+  feedbackContainer.value.scrollTo({
+    top: feedbackContainer.value.scrollHeight, // 目标位置（底部）
+    behavior: "smooth", // 平滑滚动（替代：'auto' 立即滚动）
+  });
+}
+
+const replyToUser = async (name) => {
   try {
     console.log("回复", reply);
-    const response = await feedbacksService.replyFeedback(id, reply.value);
+    const response = await feedbacksService.submitFeedback({
+      name,
+      message: { role: "admin", msg: reply.value },
+    });
     console.log("reply-response", response);
+    reply.value = "";
     showSnackbar("回复成功！", "green");
     fetchFeedback();
   } catch (err) {
@@ -232,7 +242,7 @@ const getRatingColor = (rating) => {
 
 const messageRules = [
   (v) => !!v || "Message is required",
-  (v) => (v && v.length >= 5) || "Message must contain at least 5 characters",
+  (v) => (v && v.length >= 10) || "Message must contain at least 10 characters",
   (v) =>
     (v && v.length <= 500) || "Message must contain less than 500 characters",
 ];
@@ -293,10 +303,6 @@ const confirmDelete = async () => {
   }
   deleteDialog.value = false;
 };
-
-onMounted(() => {
-  fetchFeedback();
-});
 </script>
 
 <style scoped>

@@ -23,13 +23,10 @@
                   <v-card class="elevation-8 rounded-lg">
                     <div
                       class="d-flex justify-end pa-2 pa-sm-4"
-                      @click="isOpenFeedback = true"
+                      @click="openMailboxDislog"
                     >
-                      <v-icon size="large" class="d-none d-sm-flex" end
-                        >mdi-menu</v-icon
-                      >
-                      <v-icon size="medium" class="d-sm-none" end
-                        >mdi-menu</v-icon
+                      <v-icon size="large" color="red" class="d-sm-none" end
+                        >mdi-message-bulleted</v-icon
                       >
                     </div>
 
@@ -59,23 +56,14 @@
                           required
                           class="mb-3 mb-sm-4 text-start"
                         ></v-text-field>
-                        <v-select
-                          v-model="feedback.rating"
-                          label="Rating (1-5)"
-                          prepend-inner-icon="mdi-star"
-                          variant="outlined"
-                          :items="ratingItems"
-                          :rules="ratingRules"
-                          required
-                          class="mb-3 mb-sm-4 text-start"
-                        ></v-select>
+
                         <v-textarea
                           v-model="feedback.message"
                           label="Message"
                           prepend-inner-icon="mdi-message"
                           variant="outlined"
                           :rules="messageRules"
-                          rows="3"
+                          rows="4"
                           required
                           class="mb-3 mb-sm-4 text-start"
                         ></v-textarea>
@@ -119,91 +107,55 @@
         </v-col>
       </v-row>
     </v-container>
+
     <!-- 历史对话弹窗 -->
     <v-dialog v-model="isOpenFeedback" max-width="600" scrollable>
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center pa-4">
-          <span class="text-h6">Reply History</span>
+          <span class="text-h6">Mailbox</span>
           <v-btn icon @click="isOpenFeedback = false" variant="text">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
-        <v-card-text class="pa-4">
-          <template v-if="feedbackHistory.length">
-            <div v-for="item in feedbackHistory" :key="item._id" class="mb-4">
-              <v-card class="elevation-2 pa-3">
-                <div
-                  class="d-flex justify-space-between align-start flex-column flex-sm-row"
-                >
-                  <div class="d-flex align-center mb-2 mb-sm-0">
-                    <v-avatar color="blue-lighten-1" size="40" class="me-3">
-                      <v-icon color="white" size="small">mdi-account</v-icon>
-                    </v-avatar>
-                    <div>
-                      <div class="text-subtitle-1 font-weight-medium">
-                        {{ userId }}
-                      </div>
-                      <div class="text-caption text-grey-darken-1">
-                        {{ formatDate(item.createdAt) }}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="d-flex flex-column align-start align-sm-end">
-                    <v-btn
-                      color="red"
-                      size="x-small"
-                      variant="outlined"
-                      @click="deleteFeedback(item._id)"
-                      class="mb-1"
-                    >
-                      Withdraw
-                    </v-btn>
-                    <v-chip size="small" v-if="!item.isReply" color="orange"
-                      >Processing</v-chip
-                    >
-                    <v-chip size="small" v-if="item.isReply" color="green"
-                      >Successful</v-chip
-                    >
-                  </div>
-                </div>
-                <div class="mt-3">
-                  <v-expansion-panels>
-                    <v-expansion-panel
-                      title="FeedBack Info"
-                      :text="item.message"
-                    ></v-expansion-panel>
-                    <v-expansion-panel
-                      v-if="item.isReply"
-                      title="Reply Info"
-                      :text="item.reply"
-                    ></v-expansion-panel>
-                  </v-expansion-panels>
-                </div>
-              </v-card>
-            </div>
-          </template>
-          <template v-else>
-            <div class="text-center py-8">
-              <v-icon size="64" color="grey-lighten-1" class="mb-2"
-                >mdi-inbox</v-icon
+        <v-card-text class="pa-3">
+          <div
+            ref="MailboxContainer"
+            style="max-height: 70vh; overflow-y: auto"
+          >
+            <template v-if="feedbackHistory.length">
+              <v-banner
+                v-for="item in feedbackHistory"
+                :avatar="
+                  item.role === 'user' ? 'userAvatar.svg' : 'adminAvatar.svg'
+                "
+                :text="item.msg"
+                :stacked="false"
               >
-              <div class="text-h6 text-grey-darken-1">No feedback</div>
-            </div>
-          </template>
+              </v-banner>
+            </template>
+            <template v-else>
+              <div class="text-center py-8">
+                <v-icon size="64" color="grey-lighten-1" class="mb-2"
+                  >mdi-inbox</v-icon
+                >
+                <div class="text-h6 text-grey-darken-1">No feedback</div>
+              </div>
+            </template>
+          </div>
         </v-card-text>
       </v-card>
     </v-dialog>
-  </div>
 
-  <SnackBar
-    v-model="snackbar.show"
-    :snacbarText="snackbar.text"
-    :snackbarColorBt="snackbar.color"
-  ></SnackBar>
+    <SnackBar
+      v-model="snackbar.show"
+      :snacbarText="snackbar.text"
+      :snackbarColorBt="snackbar.color"
+    ></SnackBar>
+  </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, inject, openBlock } from "vue";
+import { ref, reactive, onMounted, inject, openBlock, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { feedbacksService } from "@/services/feedbacks.service";
 import { useAuthStore } from "@/stores/auth";
@@ -221,12 +173,31 @@ const statsSection = ref(null);
 const isOpenFeedback = ref(false);
 // 定义响应式变量存储userId
 const userId = ref("No UserId");
+// dom
+const MailboxContainer = ref(null);
 
 onMounted(async () => {
   await initUserId();
-  getFeedbackByName(userId.value);
+  await getFeedbackByName(userId.value);
   fetchStats();
 });
+
+function smoothScrollToBottom() {
+  console.log("MailboxContainer.height", MailboxContainer.value);
+  if (!MailboxContainer.value) return;
+  MailboxContainer.value.scrollTo({
+    top: MailboxContainer.value.scrollHeight, // 目标位置（底部）
+    behavior: "smooth", // 平滑滚动（替代：'auto' 立即滚动）
+  });
+}
+
+const openMailboxDislog = () => {
+  isOpenFeedback.value = true;
+  // 等待弹窗渲染完成后再滚动
+  nextTick(() => {
+    smoothScrollToBottom();
+  });
+};
 
 // 复用你的原生getQueryParams方法（完全不变，直接用）
 const getQueryParams = () => {
@@ -334,9 +305,7 @@ const handleSubmitFeedback = async () => {
   try {
     const response = await feedbacksService.submitFeedback({
       name: userId.value,
-      rating: feedback.rating,
-      message: feedback.message,
-      isReply: false,
+      message: { role: "user", msg: feedback.message },
     });
     showSnackbar("Your feedback has been submitted successfully!", "green");
     resetForm();
@@ -379,7 +348,7 @@ const fetchStats = async () => {
 const getFeedbackByName = async (name) => {
   try {
     const response = await feedbacksService.fetchFeedbackByName(name);
-    feedbackHistory.value = response;
+    feedbackHistory.value = response[0].message;
     console.log("feedback-name", response);
   } catch (error) {
     console.error("Error fetching stats:", error);

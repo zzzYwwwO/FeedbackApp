@@ -16,61 +16,6 @@
           </v-col>
         </v-row>
 
-        <!-- Statistics Cards -->
-        <v-row class="mb-6">
-          <v-col cols="12" sm="6" md="3">
-            <v-card
-              class="text-center pa-4"
-              color="blue-lighten-5"
-              @click="filterBy('all')"
-            >
-              <v-icon size="48" color="blue">mdi-message-text</v-icon>
-              <div class="text-h4 font-weight-bold mt-2">
-                {{ feedbacks.length }}
-              </div>
-              <div class="text-subtitle-2 text-grey-darken-1">总反馈数</div>
-            </v-card>
-          </v-col>
-
-          <v-col cols="12" sm="6" md="3">
-            <v-card class="text-center pa-4" color="amber-lighten-5">
-              <v-icon size="48" color="amber">mdi-star</v-icon>
-              <div class="text-h4 font-weight-bold mt-2">
-                {{ averageRating }}
-              </div>
-              <div class="text-subtitle-2 text-grey-darken-1">平均评分</div>
-            </v-card>
-          </v-col>
-
-          <v-col cols="12" sm="6" md="3">
-            <v-card
-              class="text-center pa-4"
-              color="green-lighten-5"
-              @click="filterBy('positive')"
-            >
-              <v-icon size="48" color="green">mdi-thumb-up</v-icon>
-              <div class="text-h4 font-weight-bold mt-2">
-                {{ positiveFeedbacks }}
-              </div>
-              <div class="text-subtitle-2 text-grey-darken-1">正面反馈</div>
-            </v-card>
-          </v-col>
-
-          <v-col cols="12" sm="6" md="3">
-            <v-card
-              class="text-center pa-4"
-              color="purple-lighten-5"
-              @click="filterBy('weekly')"
-            >
-              <v-icon size="48" color="purple">mdi-calendar-week</v-icon>
-              <div class="text-h4 font-weight-bold mt-2">
-                {{ weeklyFeedbacks }}
-              </div>
-              <div class="text-subtitle-2 text-grey-darken-1">本周</div>
-            </v-card>
-          </v-col>
-        </v-row>
-
         <!-- Filters and Search -->
         <v-card class="mb-4">
           <v-card-text>
@@ -86,39 +31,8 @@
                   clearable
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" md="3">
-                <v-select
-                  v-model="sortBy"
-                  label="排序方式"
-                  :items="sortOptions"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                ></v-select>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-select
-                  v-model="filterRating"
-                  label="按评分筛选"
-                  :items="ratingFilterOptions"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                ></v-select>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-select
-                  v-model="isReply"
-                  label="按是否回复筛选"
-                  :items="isReplyOpt"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                ></v-select>
-              </v-col>
-              <v-col cols="12" md="2">
+
+              <!-- <v-col cols="12" md="2">
                 <v-btn
                   color="error"
                   variant="outlined"
@@ -127,7 +41,7 @@
                 >
                   清除筛选
                 </v-btn>
-              </v-col>
+              </v-col> -->
             </v-row>
           </v-card-text>
         </v-card>
@@ -211,33 +125,6 @@
                     </div>
 
                     <div class="d-flex align-center">
-                      <v-chip
-                        v-if="feedback.isReply"
-                        color="green"
-                        size="small"
-                        variant="flat"
-                      >
-                        已回复
-                      </v-chip>
-                      <v-chip
-                        v-if="!feedback.isReply"
-                        color="red"
-                        size="small"
-                        variant="flat"
-                      >
-                        未回复
-                      </v-chip>
-                      <div style="width: 1vw"></div>
-                      <v-chip
-                        :color="getRatingColor(feedback.rating)"
-                        variant="flat"
-                        class="text-white me-2"
-                        size="small"
-                      >
-                        <v-icon start size="small">mdi-star</v-icon>
-                        {{ feedback.rating }}
-                      </v-chip>
-
                       <v-menu>
                         <template v-slot:activator="{ props }">
                           <v-btn
@@ -266,8 +153,10 @@
                     </div>
                   </div>
 
-                  <div class="text-body-1" dir="ltr">
-                    {{ truncateMessage(feedback.message) }}
+                  <div style="max-height: 10vh; overflow-y: auto">
+                    <div v-for="item in feedback.message">
+                      {{ item.role + ":  " + truncateMessage(item.msg) }}
+                    </div>
                   </div>
                 </v-card-text>
               </v-card>
