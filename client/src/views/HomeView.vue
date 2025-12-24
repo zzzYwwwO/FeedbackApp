@@ -1,112 +1,124 @@
 <template>
-  <v-container fluid class="pa-0">
-    <div class="gradient-bg min-h-screen d-flex align-center justify-center">
-      <v-container class="py-4 py-sm-8">
-        <v-row justify="center">
-          <v-col cols="12" sm="10" md="8" lg="6">
-            <!-- Header -->
-            <div class="text-center mb-4 mb-sm-8">
-              <h1 class="text-h4 text-sm-h3 font-weight-bold text-white mb-2">
-                Feedback
-              </h1>
-              <p class="text-body-1 text-sm-h6 text-blue-lighten-1">
-                We're happy to hear your feedback
-              </p>
-            </div>
+  <div class="gradient-bg min-h-screen">
+    <v-container fluid class="pa-0 fill-height">
+      <v-row no-gutters class="fill-height">
+        <v-col cols="12" class="d-flex align-center justify-center">
+          <div class="w-100">
+            <v-container class="py-4 py-sm-8">
+              <v-row justify="center">
+                <v-col cols="12" sm="10" md="8" lg="6">
+                  <!-- Header -->
+                  <div class="text-center mb-4 mb-sm-8">
+                    <h1
+                      class="text-h4 text-sm-h3 font-weight-bold text-white mb-2"
+                    >
+                      Feedback
+                    </h1>
+                    <p class="text-body-1 text-sm-h6 text-blue-lighten-1">
+                      We're happy to hear your feedback
+                    </p>
+                  </div>
 
-            <!-- Feedback Card -->
-            <v-card class="elevation-8 rounded-lg">
-              <div
-                class="d-flex justify-end pa-2 pa-sm-4"
-                @click="isOpenFeedback = true"
-              >
-                <v-icon size="large" class="d-none d-sm-flex" end
-                  >mdi-menu</v-icon
-                >
-                <v-icon size="medium" class="d-sm-none" end>mdi-menu</v-icon>
-              </div>
+                  <!-- Feedback Card -->
+                  <v-card class="elevation-8 rounded-lg">
+                    <div
+                      class="d-flex justify-end pa-2 pa-sm-4"
+                      @click="isOpenFeedback = true"
+                    >
+                      <v-icon size="large" class="d-none d-sm-flex" end
+                        >mdi-menu</v-icon
+                      >
+                      <v-icon size="medium" class="d-sm-none" end
+                        >mdi-menu</v-icon
+                      >
+                    </div>
 
-              <v-card-title class="text-center pa-4 pa-sm-6">
-                <v-icon class="me-2" color="primary">mdi-message-text</v-icon>
-                <span class="text-h6 text-sm-h5">Feedback Form</span>
-              </v-card-title>
-              <v-card-subtitle class="text-center pb-2 pb-sm-4">
-                Click the top right corner to view replies
-              </v-card-subtitle>
+                    <v-card-title class="text-center pa-4 pa-sm-6">
+                      <v-icon class="me-2" color="primary"
+                        >mdi-message-text</v-icon
+                      >
+                      <span class="text-h6 text-sm-h5">Feedback Form</span>
+                    </v-card-title>
+                    <v-card-subtitle class="text-center pb-2 pb-sm-4">
+                      Click the top right corner to view replies
+                    </v-card-subtitle>
 
-              <v-card-text class="pa-4 pa-sm-6">
-                <v-form
-                  ref="form"
-                  v-model="valid"
-                  @submit.prevent="handleSubmitFeedback"
-                  class="text-start"
-                >
-                  <v-text-field
-                    v-model="userId"
-                    readonly=""
-                    prepend-inner-icon="mdi-account"
-                    variant="outlined"
-                    :rules="nameRules"
-                    required
-                    class="mb-3 mb-sm-4 text-start"
-                  ></v-text-field>
-                  <v-select
-                    v-model="feedback.rating"
-                    label="Rating (1-5)"
-                    prepend-inner-icon="mdi-star"
-                    variant="outlined"
-                    :items="ratingItems"
-                    :rules="ratingRules"
-                    required
-                    class="mb-3 mb-sm-4 text-start"
-                  ></v-select>
-                  <v-textarea
-                    v-model="feedback.message"
-                    label="Message"
-                    prepend-inner-icon="mdi-message"
-                    variant="outlined"
-                    :rules="messageRules"
-                    rows="3"
-                    required
-                    class="mb-3 mb-sm-4 text-start"
-                  ></v-textarea>
+                    <v-card-text class="pa-4 pa-sm-6">
+                      <v-form
+                        ref="form"
+                        v-model="valid"
+                        @submit.prevent="handleSubmitFeedback"
+                        class="text-start"
+                      >
+                        <v-text-field
+                          v-model="userId"
+                          readonly=""
+                          prepend-inner-icon="mdi-account"
+                          variant="outlined"
+                          :rules="nameRules"
+                          required
+                          class="mb-3 mb-sm-4 text-start"
+                        ></v-text-field>
+                        <v-select
+                          v-model="feedback.rating"
+                          label="Rating (1-5)"
+                          prepend-inner-icon="mdi-star"
+                          variant="outlined"
+                          :items="ratingItems"
+                          :rules="ratingRules"
+                          required
+                          class="mb-3 mb-sm-4 text-start"
+                        ></v-select>
+                        <v-textarea
+                          v-model="feedback.message"
+                          label="Message"
+                          prepend-inner-icon="mdi-message"
+                          variant="outlined"
+                          :rules="messageRules"
+                          rows="3"
+                          required
+                          class="mb-3 mb-sm-4 text-start"
+                        ></v-textarea>
 
-                  <v-btn
-                    type="submit"
-                    color="primary"
-                    size="large"
-                    block
-                    :loading="loading"
-                    :disabled="!valid"
-                    class="mb-3 mb-sm-4"
+                        <v-btn
+                          type="submit"
+                          color="primary"
+                          size="large"
+                          block
+                          :loading="loading"
+                          :disabled="!valid"
+                          class="mb-3 mb-sm-4"
+                        >
+                          <v-icon start>mdi-send</v-icon>
+                          Submit Feedback
+                        </v-btn>
+                      </v-form>
+                    </v-card-text>
+                  </v-card>
+
+                  <!-- Actions -->
+                  <div
+                    class="text-center mt-4 mt-sm-6"
+                    v-if="authStore.isAuthenticated"
                   >
-                    <v-icon start>mdi-send</v-icon>
-                    Submit Feedback
-                  </v-btn>
-                </v-form>
-              </v-card-text>
-            </v-card>
-
-            <!-- Actions -->
-            <div
-              class="text-center mt-4 mt-sm-6"
-              v-if="authStore.isAuthenticated"
-            >
-              <v-btn
-                variant="outlined"
-                color="white"
-                :to="{ name: 'Admin' }"
-                class="me-3 me-sm-4"
-                size="large"
-              >
-                <v-icon start>mdi-shield-account</v-icon>
-                Admin Panel
-              </v-btn>
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
+                    <v-btn
+                      variant="outlined"
+                      color="white"
+                      :to="{ name: 'Admin' }"
+                      class="me-3 me-sm-4"
+                      size="large"
+                    >
+                      <v-icon start>mdi-shield-account</v-icon>
+                      Admin Panel
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-container>
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
     <!-- 历史对话弹窗 -->
     <v-dialog v-model="isOpenFeedback" max-width="600" scrollable>
       <v-card>
@@ -181,7 +193,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-  </v-container>
+  </div>
 
   <SnackBar
     v-model="snackbar.show"
@@ -379,10 +391,16 @@ const getFeedbackByName = async (name) => {
 .gradient-bg {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
+  width: 100%;
 }
 
 .v-card {
   backdrop-filter: blur(10px);
+}
+
+/* 确保容器占满宽度 */
+.w-100 {
+  width: 100%;
 }
 
 /* 响应式字体大小 */
@@ -395,7 +413,7 @@ const getFeedbackByName = async (name) => {
 /* 移动端优化 */
 @media (max-width: 960px) {
   .gradient-bg {
-    padding: 16px 0;
+    padding: 0;
   }
 
   .v-card {
@@ -406,7 +424,7 @@ const getFeedbackByName = async (name) => {
 /* 平板优化 */
 @media (min-width: 960px) and (max-width: 1264px) {
   .v-container {
-    max-width: 900px;
+    max-width: 100%;
   }
 }
 </style>
