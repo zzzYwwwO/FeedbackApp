@@ -1,6 +1,6 @@
 <template>
   <div class="gradient-bg min-h-screen">
-    <v-container fluid class="pa-0 fill-height">
+    <v-container fluid class="pa-0" height="100vh">
       <v-row no-gutters class="fill-height">
         <v-col cols="12" class="d-flex align-center justify-center">
           <div class="w-100">
@@ -25,7 +25,7 @@
                       class="d-flex justify-end pa-2 pa-sm-4"
                       @click="openMailboxDislog"
                     >
-                      <v-icon size="large" color="red" class="d-sm-none" end
+                      <v-icon size="large" color="red" end
                         >mdi-message-bulleted</v-icon
                       >
                     </div>
@@ -175,9 +175,11 @@ const isOpenFeedback = ref(false);
 const userId = ref("No UserId");
 // dom
 const MailboxContainer = ref(null);
+// 语言
+const language = ref("");
 
 onMounted(async () => {
-  await initUserId();
+  await init();
   await getFeedbackByName(userId.value);
   fetchStats();
 });
@@ -211,12 +213,17 @@ const getQueryParams = () => {
   return queryParams;
 };
 
-const initUserId = async () => {
+const init = async () => {
   // 获取所有URL参数
   const params = getQueryParams();
   // 赋值给userId（模拟你示例中的document.querySelector赋值逻辑）
   if (params.userId) {
     userId.value = params.userId;
+  }
+
+  if (params.language) {
+    language.value = params.language;
+    console.log("language", language.value);
   }
 };
 
