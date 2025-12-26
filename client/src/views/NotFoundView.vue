@@ -13,16 +13,6 @@
           </p>
 
           <div class="d-flex justify-center gap-4 flex-wrap">
-            <v-btn color="primary" size="large" :to="{ name: 'Home' }">
-              <v-icon start>mdi-home</v-icon>
-              Home Page
-            </v-btn>
-
-            <v-btn variant="outlined" size="large" :to="{ name: 'Admin' }">
-              <v-icon start>mdi-shield-account</v-icon>
-              Admin Panel
-            </v-btn>
-
             <v-btn variant="text" size="large" @click="$router.go(-1)">
               <v-icon start>mdi-arrow-right</v-icon>
               Go Back
