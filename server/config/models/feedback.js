@@ -1,20 +1,25 @@
 import mongoose from "mongoose";
 
-const messageItemSchema = new mongoose.Schema({
-  role: {
-    type: String,
-    required: true,
-    enum: ["user", "admin"],
-    trim: true,
+const messageItemSchema = new mongoose.Schema(
+  {
+    role: {
+      type: String,
+      required: true,
+      enum: ["user", "admin"],
+      trim: true,
+    },
+    msg: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 10,
+      maxlength: 500,
+    },
   },
-  msg: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 10,
-    maxlength: 500,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Feedback Schema
 const feedbackSchema = new mongoose.Schema(
