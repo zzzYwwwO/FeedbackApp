@@ -44,7 +44,7 @@
                   <v-icon color="primary">mdi-account</v-icon>
                 </v-avatar>
                 <div>
-                  <div class="text-h5">{{ feedback.name }}</div>
+                  <div class="text-h5">{{ feedback.userId }}</div>
                   <div class="text-caption">
                     {{ formatDate(feedback.createdAt) }}
                   </div>
@@ -103,7 +103,7 @@
             <v-card variant="outlined" class="mt-4 pa-4">
               <div style="display: flex; justify-content: space-between">
                 <h4 class="text-h6 mb-3">回复</h4>
-                <v-btn @click="replyToUser(feedback.name)">
+                <v-btn @click="replyToUser(feedback.userId)">
                   提交
                   <template #append>
                     <img src="/send.svg" alt="" />

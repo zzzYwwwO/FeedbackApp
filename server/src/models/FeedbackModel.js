@@ -19,10 +19,7 @@ class FeedbackModel {
 
     // Search filter
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { message: { $regex: search, $options: "i" } },
-      ];
+      query = { userId: { $regex: search, $options: "i" } };
     }
 
     // Rating filter
@@ -88,7 +85,7 @@ class FeedbackModel {
 
   static async getFeedbackByName(name) {
     // name即userid
-    return await Feedback.find({ name: name });
+    return await Feedback.find({ userId: name });
   }
 
   // 回复用户
@@ -107,7 +104,7 @@ class FeedbackModel {
   static async createFeedback(newFeedback) {
     const { name, message } = newFeedback;
     return await Feedback.findOneAndUpdate(
-      { name: name },
+      { userId: name },
       { $push: { message: message } }, // 像message字段追加数据message
       {
         upsert: true, // 无匹配文档则创建,有就更新！

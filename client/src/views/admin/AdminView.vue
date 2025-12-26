@@ -116,7 +116,7 @@
                       </v-avatar>
                       <div>
                         <div class="text-h6 font-weight-medium">
-                          {{ feedback.name }}
+                          {{ feedback.userId }}
                         </div>
                         <div class="text-caption text-grey-darken-1">
                           {{ formatDate(feedback.createdAt) }}

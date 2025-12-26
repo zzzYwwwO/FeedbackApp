@@ -355,7 +355,7 @@ const fetchStats = async () => {
 const getFeedbackByName = async (name) => {
   try {
     const response = await feedbacksService.fetchFeedbackByName(name);
-    feedbackHistory.value = response[0].message;
+    feedbackHistory.value = response[0]?.message || [];
     console.log("feedback-name", response);
   } catch (error) {
     console.error("Error fetching stats:", error);
