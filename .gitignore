@@ -12,7 +12,7 @@ npm-shrinkwrap.json
 
 # ===================== 构建/编译产物 =====================
 # Express 项目常见构建目录（如用tsc编译、babel转译）
-dist/
+# dist/
 build/
 out/
 lib/

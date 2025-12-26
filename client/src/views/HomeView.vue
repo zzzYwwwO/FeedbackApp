@@ -12,7 +12,7 @@
                     <h1
                       class="text-h4 text-sm-h3 font-weight-bold text-white mb-2"
                     >
-                      Feedback
+                      SoulTalk
                     </h1>
                     <p class="text-body-1 text-sm-h6 text-blue-lighten-1">
                       We're happy to hear your feedback

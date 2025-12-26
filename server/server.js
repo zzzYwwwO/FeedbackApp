@@ -32,6 +32,8 @@ export default function server() {
   if (isProduction) {
     // 生产环境：使用打包好的dist文件
     console.log("🚀 Production mode: Serving static files from dist/");
+    console.log(`user: http://localhost:${process.env.PORT}/?userId=user_503`);
+    console.log(`admin: http://localhost:${process.env.PORT}/admin`);
     app.use(express.static(path.join(__dirname, "dist")));
   } else {
     // 开发环境：使用前端开发服务器（需要npm run dev）
@@ -91,13 +93,13 @@ export default function server() {
 
       app.listen(process.env.PORT, () => {
         console.log(`Server is running on port ${process.env.PORT}`);
-        console.log(`Frontend: http://localhost:${process.env.PORT_FRONTEND}`);
-        console.log(
-          `Admin login: http://localhost:${process.env.PORT_FRONTEND}/login`
-        );
-        console.log(
-          `Admin Panel: http://localhost:${process.env.PORT_FRONTEND}/admin`
-        );
+        // console.log(`Frontend: http://localhost:${process.env.PORT_FRONTEND}`);
+        // console.log(
+        //   `Admin login: http://localhost:${process.env.PORT_FRONTEND}/login`
+        // );
+        // console.log(
+        //   `Admin Panel: http://localhost:${process.env.PORT_FRONTEND}/admin`
+        // );
       });
     })
     .catch((error) => {
