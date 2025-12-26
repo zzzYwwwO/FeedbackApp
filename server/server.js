@@ -4,9 +4,8 @@ import * as url from "url";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import auth from "./src/router/authRoute.js";
+// import auth from "./src/router/authRoute.js";
 import feedback from "./src/router/feedbackRoute.js";
-import Users from "./config/models/users.js";
 import Feedback from "./config/models/feedback.js";
 dotenv.config();
 
@@ -49,41 +48,18 @@ export default function server() {
     .connect(uri, {})
     .then(async (results) => {
       try {
-        // create demo admin if not exist
-        const adminEmail = "admin@example.com";
-        const existingAdmin = await Users.findOne({ email: adminEmail });
-
-        if (!existingAdmin) {
-          const admin = new Users({
-            name: "Admin",
-            email: adminEmail,
-            password: "Admin1234", // סיסמה עומדת בתנאים (אותיות+מספרים, לפחות 9 תווים)
-            role: "admin",
-          });
-
-          await admin.save();
-          console.log("Default demo admin created:");
-          console.log(`   Email: ${adminEmail}`);
-          console.log("   Password: Admin1234");
-        } else {
-          console.log("Demo admin already exists.");
-        }
-
-        // Create 12 demo feedbacks if none exist
+        // Create 1 demo feedbacks if none exist
         const feedbackCount = await Feedback.countDocuments();
         if (feedbackCount === 0) {
           const sampleFeedbacks = [];
 
-          for (let i = 1; i <= 12; i++) {
-            sampleFeedbacks.push({
-              name: `user ${i}`,
-              rating: Math.floor(Math.random() * 5) + 1,
-              message: `This is sample feedback number ${i} for demonstration purposes.`,
-            });
-          }
+          sampleFeedbacks.push({
+            userId: `Robot`,
+            message: { role: "user", msg: "Hello World" },
+          });
 
           await Feedback.insertMany(sampleFeedbacks);
-          console.log("12 demo feedbacks inserted");
+          console.log("1 demo feedbacks inserted");
         } else {
           console.log("Feedbacks already exist.");
         }
@@ -93,20 +69,13 @@ export default function server() {
 
       app.listen(process.env.PORT, () => {
         console.log(`Server is running on port ${process.env.PORT}`);
-        // console.log(`Frontend: http://localhost:${process.env.PORT_FRONTEND}`);
-        // console.log(
-        //   `Admin login: http://localhost:${process.env.PORT_FRONTEND}/login`
-        // );
-        // console.log(
-        //   `Admin Panel: http://localhost:${process.env.PORT_FRONTEND}/admin`
-        // );
       });
     })
     .catch((error) => {
       console.error("Error connecting to the database:", error);
     });
 
-  app.use("/api/auth", auth);
+  // app.use("/api/auth", auth);
   app.use("/api/feedback", feedback);
 
   // 根据环境变量配置路由处理

@@ -24,18 +24,12 @@ const messageItemSchema = new mongoose.Schema(
 // Feedback Schema
 const feedbackSchema = new mongoose.Schema(
   {
-    name: {
+    userId: {
       type: String,
       required: true,
       unique: true,
       trim: true,
       minlength: 2,
-    },
-    rating: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 5,
     },
     message: {
       type: [messageItemSchema],
