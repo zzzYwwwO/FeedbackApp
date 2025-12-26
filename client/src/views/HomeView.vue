@@ -217,8 +217,8 @@ const init = async () => {
   // 获取所有URL参数
   const params = getQueryParams();
   // 赋值给userId（模拟你示例中的document.querySelector赋值逻辑）
-  if (params.userId) {
-    userId.value = params.userId;
+  if (params.userid) {
+    userId.value = params.userid;
   }
 
   if (params.language) {

@@ -11,6 +11,12 @@ Admins can login, view, filter, and manage feedback via a clean and responsive d
 
 ---
 ## 运行与env
+- 前端打包前配置一下服务器的端口等
+  ```bash
+  # /client/.env
+  # 不能是本地的，笔记
+  VITE_BASE_URL=http://localhost:3000
+  ```
 - 在/server下新建.env 
   ```bash
     PORT=3000
